@@ -127,10 +127,127 @@
   width: 180px;
   margin-bottom: 10px;
 }
+/* ===== LOGIN ===== */
 
+#loginScreen{
+  position:fixed;
+  inset:0;
+  background:#0d1117;
+  display:flex;
+  justify-content:center;
+  align-items:center;
+  z-index:9999;
+}
+
+.login-box{
+  width:350px;
+  background:#161b22;
+  border:1px solid #30363d;
+  border-radius:12px;
+  padding:30px;
+  text-align:center;
+}
+
+.login-logo{
+  width:180px;
+  margin-bottom:20px;
+}
+
+.login-box h2{
+  margin-bottom:10px;
+}
+
+.login-box p{
+  color:#7d8590;
+  margin-bottom:15px;
+}
+
+.login-box input{
+  width:100%;
+  padding:12px;
+  background:#0d1117;
+  border:1px solid #30363d;
+  border-radius:8px;
+  color:white;
+  margin-bottom:15px;
+}
+
+.login-box button{
+  width:100%;
+  padding:12px;
+  border:none;
+  border-radius:8px;
+  background:#f0a500;
+  color:black;
+  font-weight:600;
+  cursor:pointer;
+}
+
+.login-box button:hover{
+  background:#ffb800;
+}
+
+#loginError{
+  color:#f85149;
+  display:none;
+  margin-top:10px;
+}
+.password-container{
+  position:relative;
+  width:100%;
+  margin-bottom:15px;
+}
+
+.password-container input{
+  width:100%;
+  padding:12px;
+  padding-right:45px;
+}
+
+.toggle-password{
+  position:absolute;
+  right:15px;
+  top:50%;
+  transform:translateY(-50%);
+  cursor:pointer;
+  font-size:18px;
+  user-select:none;
+}
 </style>
 </head>
 <body>
+<!-- PANTALLA DE ACCESO -->
+<div id="loginScreen">
+  <div class="login-box">
+
+    <img src="LOGO APPLUS.png" alt="Logo Applus" class="login-logo">
+
+    <h2>Acceso al Sistema</h2>
+
+    <p>Ingrese la contraseña para continuar</p>
+
+    <div class="password-container">
+      <input
+        type="password"
+        id="loginPassword"
+        placeholder="Contraseña"
+        autocomplete="off"
+      >
+
+      <span class="toggle-password" onclick="togglePassword()">
+        👁️
+      </span>
+    </div>
+
+    <button onclick="login()">Ingresar</button>
+
+    <p id="loginError">Contraseña incorrecta</p>
+
+  </div>
+</div>
+
+<!-- CONTENIDO DEL SISTEMA -->
+<div id="appContent" style="display:none;">
 
 <div class="wrapper">
 
@@ -554,5 +671,41 @@
   }
 </script>
 <script src="https://cdn.jsdelivr.net/npm/xlsx/dist/xlsx.full.min.js"></script>
+</div>
+
+<script>
+
+function login() {
+
+  const password =
+    document.getElementById('loginPassword').value;
+
+  if (password === 'GABINETE') {
+
+    document.getElementById('loginScreen').style.display = 'none';
+    document.getElementById('appContent').style.display = 'block';
+
+  } else {
+
+    document.getElementById('loginError').style.display = 'block';
+    document.getElementById('loginPassword').value = '';
+
+  }
+}
+function togglePassword() {
+
+  const input = document.getElementById('loginPassword');
+
+  if (input.type === 'password') {
+    input.type = 'text';
+  } else {
+    input.type = 'password';
+  }
+
+}
+
+
+</script>
+
 </body>
 </html>
