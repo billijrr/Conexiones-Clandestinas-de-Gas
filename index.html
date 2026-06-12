@@ -510,7 +510,7 @@
     );
 
     const data = await response.json();
-
+    console.log(data);
     return data.secure_url;
   }
   function validate() {
@@ -530,31 +530,7 @@
       document.getElementById('err-' + id).classList.remove('show');
     });
   });
-  async function subirCloudinary(file){
-
-    if(!file) return null;
-
-    const formData = new FormData();
-
-    formData.append("file", file);
-
-    formData.append(
-      "upload_preset",
-      "Gabinetes clandestinos"
-    );
-
-    const response = await fetch(
-      "https://api.cloudinary.com/v1_1/TU_CLOUD_NAME/image/upload",
-      {
-        method: "POST",
-        body: formData
-      }
-    );
-
-    const data = await response.json();
-
-    return data.secure_url;
-  }
+  
   document.getElementById('mainForm').addEventListener('submit', function(e) {
     e.preventDefault();
     if (!validate()) return;
@@ -575,7 +551,7 @@
       document.getElementById('fotoPanoramica').files[0]
       )
     ])
-    then(([gabData, panData]) => {
+    .then(([gabData, panData]) => {
       records.push({
         id: 'ID-' + String(currentId).padStart(4, '0'),
         fecha: document.getElementById('fecha').value,
