@@ -488,7 +488,7 @@
       reader.readAsDataURL(input.files[0]);
     }
   }
-  async function subirCloudinary(file, carpeta){
+  async function subirCloudinary(file, carpeta, nombreArchivo){
 
     if(!file) return null;
 
@@ -504,6 +504,11 @@
     formData.append(
       "folder",
       carpeta
+    );
+
+    formData.append(
+      "public_id",
+      nombreArchivo
     );
 
     const response = await fetch(
@@ -573,15 +578,28 @@
       if (!file) return resolve(null);
       const r = new FileReader(); r.onload = e => resolve(e.target.result); r.readAsDataURL(file);
     });
+    const sector = document.getElementById('sector').value.trim();
+    const malla = document.getElementById('malla').value.trim();
+
+    const nombreGab =
+    `${distrito}_${sector}_${malla}_GAB`
+    .toUpperCase();
+
+    const nombrePan =
+    `${distrito}_${sector}_${malla}_PAN`
+    .toUpperCase();
+
     Promise.all([
       subirCloudinary(
-      document.getElementById('fotoGabinete').files[0],
-      carpeta
+        document.getElementById('fotoGabinete').files[0],
+        carpeta,
+        nombreGab
       ),
 
       subirCloudinary(
-      document.getElementById('fotoPanoramica').files[0],
-      carpeta
+        document.getElementById('fotoPanoramica').files[0],
+        carpeta,
+        nombrePan
       )
     ])
     .then(([gabData, panData]) => {
