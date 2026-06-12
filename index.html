@@ -488,7 +488,31 @@
       reader.readAsDataURL(input.files[0]);
     }
   }
+  async function subirCloudinary(file){
 
+    if(!file) return null;
+
+    const formData = new FormData();
+
+    formData.append("file", file);
+
+    formData.append(
+      "upload_preset",
+      "gabinetes_clandestinos"
+    );
+
+    const response = await fetch(
+      "https://api.cloudinary.com/v1_1/diavck7yc/image/upload",
+      {
+        method: "POST",
+        body: formData
+      }
+    );
+
+    const data = await response.json();
+
+    return data.secure_url;
+  }
   function validate() {
     let ok = true;
     ['fecha','nombres','distrito','direccion'].forEach(id => {
@@ -506,7 +530,31 @@
       document.getElementById('err-' + id).classList.remove('show');
     });
   });
+  async function subirCloudinary(file){
 
+    if(!file) return null;
+
+    const formData = new FormData();
+
+    formData.append("file", file);
+
+    formData.append(
+      "upload_preset",
+      "Gabinetes clandestinos"
+    );
+
+    const response = await fetch(
+      "https://api.cloudinary.com/v1_1/TU_CLOUD_NAME/image/upload",
+      {
+        method: "POST",
+        body: formData
+      }
+    );
+
+    const data = await response.json();
+
+    return data.secure_url;
+  }
   document.getElementById('mainForm').addEventListener('submit', function(e) {
     e.preventDefault();
     if (!validate()) return;
@@ -519,9 +567,15 @@
       const r = new FileReader(); r.onload = e => resolve(e.target.result); r.readAsDataURL(file);
     });
     Promise.all([
-      readFile(document.getElementById('fotoGabinete').files[0]),
-      readFile(document.getElementById('fotoPanoramica').files[0])
-    ]).then(([gabData, panData]) => {
+      subirCloudinary(
+    document.getElementById('fotoGabinete').files[0]
+    ),
+
+      subirCloudinary(
+      document.getElementById('fotoPanoramica').files[0]
+      )
+    ])
+    then(([gabData, panData]) => {
       records.push({
         id: 'ID-' + String(currentId).padStart(4, '0'),
         fecha: document.getElementById('fecha').value,
