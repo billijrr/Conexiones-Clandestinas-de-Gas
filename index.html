@@ -494,7 +494,17 @@
 
     const formData = new FormData();
 
-    formData.append("file", file);
+    const extension = file.name.split('.').pop();
+
+    const archivoRenombrado = new File(
+      [file],
+      `${nombreArchivo}.${extension}`,
+      {
+        type: file.type
+      }
+    );
+
+    formData.append("file", archivoRenombrado);
 
     formData.append(
       "upload_preset",
