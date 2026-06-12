@@ -275,52 +275,19 @@
           <span class="err-msg" id="err-fecha">Este campo es obligatorio.</span>
         </div>
         <div class="field full">
-          <label>Nombres y Apellidos <span class="req">*</span></label>
-          <select id="nombres" required>
-            <option value="">Seleccionar...</option>
+          <label>DNI <span class="req">*</span></label>
+          <input
+            type="text"
+            id="dni"
+            placeholder="Ingrese DNI"
+            maxlength="8"
+            pattern="[0-9]{8}"
+            required
+          >
+          <span class="err-msg" id="err-dni">
+            Ingrese un DNI válido.
+          </span>
 
-            <option>Alejos Pando Alonso</option>
-            <option>Arias Bustamante Jose Luis</option>
-            <option>Atahua Díaz Anthony Anibal</option>
-            <option>Bastidas Lazo Dany Jheferson</option>
-            <option>Cabanillas Leon Albert Martin</option>
-            <option>Carpio Rios Jonathan Javier</option>
-            <option>Castillo Miguel Edwin Frankli</option>
-            <option>Chafloque Florian Cesar Augusto</option>
-            <option>Chafloque Florian Jose Luis</option>
-            <option>Chavez Torres Jorge Luis</option>
-            <option>Chiroque Jimenez Alex Javier</option>
-            <option>Collanqui Calderon Hubert Percy</option>
-            <option>Cordova Cruz Jhon Elver</option>
-            <option>Curo Mamani Richar</option>
-            <option>De La Roca Solis Jesus Armando</option>
-            <option>Del Aguila Canayo Cesar Augusto</option>
-            <option>Espinoza Castro Clinton Pier</option>
-            <option>Garcia Rozas Omar Andres</option>
-            <option>Haro Camacho Joseph Anthony</option>
-            <option>Huaman Moreno Andree Alejandro</option>
-            <option>Huaman Rojas Juan Gabriel</option>
-            <option>Huarca Macedo David Junior</option>
-            <option>Julian Villanueva Zoila Milagros</option>
-            <option>Lima Irrazabal Luis Francisco</option>
-            <option>Mamani Arirama Jose Luis</option>
-            <option>Pérez Lozano Sergie Aldair</option>
-            <option>Perez Medina Nelson</option>
-            <option>Ramirez Jimenez Jaime</option>
-            <option>Ramos Anacleto Jorge Luis</option>
-            <option>Rivera Inocente Pedro Raul</option>
-            <option>Rojas Huapaya Jorge Luis</option>
-            <option>Saravia Lloglla Jose Antonio</option>
-            <option>Suarez Rodriguez Erick Jonathan</option>
-            <option>Trigozo Niño Junior Alexander Abel</option>
-            <option>Trujillo Garcia John Erasmo</option>
-            <option>Tuesta Sanchez Fernando Arturo</option>
-            <option>Vasquez Flores Welinton</option>
-            <option>Vilca Apaza Jorge Luis</option>
-            <option>Zegarra Gil Augusto Raul</option>
-
-          </select>
-          <span class="err-msg" id="err-nombres">Este campo es obligatorio.</span>
         </div>
       </div>
     </div>
@@ -355,19 +322,19 @@
           <span class="err-msg" id="err-direccion">Este campo es obligatorio.</span>
         </div>
         <div class="field">
-          <label>Sector</label>
-          <input type="text" id="sector" placeholder="S001500" maxlength="6">
+          <label>Sector <span class="req">*</span></label>
+          <input type="text" id="sector" placeholder="S001500" maxlength="7" required>
         </div>
         <div class="field">
-          <label>Malla</label>
-          <input type="text" id="malla" placeholder="MA0001" maxlength="6">
+          <label>Malla<span class="req">*</span></label>
+          <input type="text" id="malla" placeholder="MA0001" maxlength="6" required>
         </div>
       </div>
       <div class="field" style="margin-top:16px;">
-        <label>Coordenadas</label>
+        <label>Coordenadas<span class="req">*</span></label>
         <div class="coord-wrapper">
-          <div class="field"><label>Latitud</label><input type="text" id="latitud" placeholder="-12.046374"></div>
-          <div class="field"><label>Longitud</label><input type="text" id="longitud" placeholder="-77.042793"></div>
+          <div class="field"><label>Latitud</label><input type="text" id="latitud" placeholder="-12.046374" required></div>
+          <div class="field"><label>Longitud</label><input type="text" id="longitud" placeholder="-77.042793" required></div>
         </div>
       </div>
       <div style="margin-top:10px; text-align:right;">
@@ -381,7 +348,7 @@
         <div class="field">
           <label>Foto Gabinete</label>
           <div class="upload-area">
-            <input type="file" id="fotoGabinete" accept="image/*" onchange="previewImg(this,'prevGabinete')">
+            <input type="file" id="fotoGabinete" accept="image/*" onchange="previewImg(this,'prevGabinete')" required>
             <div class="upload-icon">🗂️</div>
             <div class="upload-label"><strong>Foto Gabinete</strong>Haz clic o arrastra una imagen</div>
             <img class="preview-img" id="prevGabinete" alt="Preview">
@@ -390,7 +357,7 @@
         <div class="field">
           <label>Foto Panorámica</label>
           <div class="upload-area">
-            <input type="file" id="fotoPanoramica" accept="image/*" onchange="previewImg(this,'prevPanoramica')">
+            <input type="file" id="fotoPanoramica" accept="image/*" onchange="previewImg(this,'prevPanoramica')" required>
             <div class="upload-icon">🌄</div>
             <div class="upload-label"><strong>Foto Panorámica</strong>Haz clic o arrastra una imagen</div>
             <img class="preview-img" id="prevPanoramica" alt="Preview">
@@ -622,7 +589,7 @@
       records.push({
         id: 'ID-' + String(currentId).padStart(4, '0'),
         fecha: document.getElementById('fecha').value,
-        nombres: document.getElementById('nombres').value.trim(),
+        dni: document.getElementById('DNI').value.trim(),
         distrito: document.getElementById('distrito').value,
         direccion: document.getElementById('direccion').value.trim(),
         sector: document.getElementById('sector').value.trim() || '—',
