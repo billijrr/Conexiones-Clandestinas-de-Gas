@@ -507,7 +507,7 @@
   }
   function validate() {
     let ok = true;
-    ['fecha','nombres','distrito','direccion'].forEach(id => {
+    ['fecha','dni','distrito','direccion'].forEach(id => {
       const el = document.getElementById(id);
       const err = document.getElementById('err-' + id);
       if (!el.value.trim()) { el.classList.add('invalid'); err.classList.add('show'); ok = false; }
@@ -516,7 +516,7 @@
     return ok;
   }
 
-  ['fecha','nombres','distrito','direccion'].forEach(id => {
+  ['fecha','dni','distrito','direccion'].forEach(id => {
     document.getElementById(id).addEventListener('input', () => {
       document.getElementById(id).classList.remove('invalid');
       document.getElementById('err-' + id).classList.remove('show');
@@ -589,7 +589,7 @@
       records.push({
         id: 'ID-' + String(currentId).padStart(4, '0'),
         fecha: document.getElementById('fecha').value,
-        dni: document.getElementById('DNI').value.trim(),
+        dni: document.getElementById('dni').value.trim(),
         distrito: document.getElementById('distrito').value,
         direccion: document.getElementById('direccion').value.trim(),
         sector: document.getElementById('sector').value.trim() || '—',
