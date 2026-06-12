@@ -488,7 +488,7 @@
       reader.readAsDataURL(input.files[0]);
     }
   }
-  async function subirCloudinary(file){
+  async function subirCloudinary(file, carpeta){
 
     if(!file) return null;
 
@@ -499,6 +499,11 @@
     formData.append(
       "upload_preset",
       "gabinetes_clandestinos"
+    );
+
+    formData.append(
+      "folder",
+      carpeta
     );
 
     const response = await fetch(
@@ -538,17 +543,42 @@
     localStorage.setItem('campoLastId', currentId);
     const lat = document.getElementById('latitud').value;
     const lng = document.getElementById('longitud').value;
+    const fecha = document.getElementById('fecha').value;
+    const distrito = document.getElementById('distrito').value;
+
+    const [anio, mes, dia] = fecha.split('-');
+
+    const meses = [
+      '',
+      'ENERO',
+      'FEBRERO',
+      'MARZO',
+      'ABRIL',
+      'MAYO',
+      'JUNIO',
+      'JULIO',
+      'AGOSTO',
+      'SETIEMBRE',
+      'OCTUBRE',
+      'NOVIEMBRE',
+      'DICIEMBRE'
+    ];
+
+    const carpeta =
+      `${anio}/${meses[parseInt(mes)]}/${dia}/${distrito}`;
     const readFile = (file) => new Promise(resolve => {
       if (!file) return resolve(null);
       const r = new FileReader(); r.onload = e => resolve(e.target.result); r.readAsDataURL(file);
     });
     Promise.all([
       subirCloudinary(
-    document.getElementById('fotoGabinete').files[0]
-    ),
+      document.getElementById('fotoGabinete').files[0],
+      carpeta
+      )
 
       subirCloudinary(
-      document.getElementById('fotoPanoramica').files[0]
+      document.getElementById('fotoPanoramica').files[0],
+      carpeta
       )
     ])
     .then(([gabData, panData]) => {
