@@ -385,7 +385,7 @@
       <table>
         <thead>
           <tr>
-            <th>ID</th><th>Fecha Ident.</th><th>Nombres y Apellidos</th><th>Distrito</th>
+            <th>ID</th><th>Fecha Ident.</th><th>Distrito</th>
             <th>Dirección</th><th>Sector</th><th>Malla</th><th>Coordenadas</th><th>Gab.</th><th>Panor.</th><th>Acciones</th>
           </tr>
         </thead>
@@ -631,7 +631,7 @@
     if (!records.length) { tbody.innerHTML = '<tr><td colspan="11" class="empty-state">Aún no hay registros.</td></tr>'; return; }
     tbody.innerHTML = records.map(r => `
       <tr>
-        <td class="td-id">${r.id}</td><td>${r.fecha}</td><td>${r.nombres}</td><td>${r.distrito}</td>
+        <td class="td-id">${r.id}</td><td>${r.fecha}</td><td>${r.distrito}</td>
         <td>${r.direccion}</td><td>${r.sector}</td><td>${r.malla}</td>
         <td style="font-size:12px;white-space:nowrap;">${r.coordenadas}</td>
         <td>${r.fotoGabinete ? `<img src="${r.fotoGabinete}" class="thumb">` : '<div class="no-img">📁</div>'}</td>
@@ -713,7 +713,7 @@
     const data = records.map(r => ({
       ID: r.id,
       Fecha: r.fecha,
-      Nombre: r.nombres,
+      DNI: r.DNI,
       Distrito: r.distrito,
       Direccion: r.direccion,
       Sector: r.sector,
