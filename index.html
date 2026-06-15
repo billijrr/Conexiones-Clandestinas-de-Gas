@@ -401,11 +401,39 @@
 <div class="toast" id="toast">✅ Registro guardado correctamente</div>
 
 <script>
+  const supabaseUrl = 'https://jonlxurpxmjcxfgqxlli.supabase.co/rest/v1/';
+  const supabaseKey = 'sb_publishable_OoYnTUMdmJ_iSOdL_nr2IQ_zhwZFrYA';
+
+  const supabaseClient =
+    window.supabase.createClient(
+      supabaseUrl,
+      supabaseKey
+    );
+  const supabaseUrl = 'https://jonlxurpxmjcxfgqxlli.supabase.co/rest/v1/';
+  const supabaseKey = 'sb_publishable_OoYnTUMdmJ_iSOdL_nr2IQ_zhwZFrYA';
+
+  const supabaseClient =
+    window.supabase.createClient(
+      supabaseUrl,
+      supabaseKey
+    );
   let records = JSON.parse(localStorage.getItem('campoRecords') || '[]');
   let currentId = parseInt(localStorage.getItem('campoLastId') || '0');
+  async function probarSupabase() {
 
+    const { data, error } =
+      await supabaseClient
+        .from('registros_clandestinos')
+        .select('*')
+        .limit(1);
+
+    console.log('DATA:', data);
+    console.log('ERROR:', error);
+
+  }
   generateNextId();
   renderTable();
+  probarSupabase();
 
   function generateNextId() {
     document.getElementById('autoId').textContent = 'ID-' + String(currentId + 1).padStart(4, '0');
@@ -585,7 +613,7 @@
         nombrePan
       )
     ])
-    .then(([gabData, panData]) => {
+    .then(async ([gabData, panData]) => {
       records.push({
         id: 'ID-' + String(currentId).padStart(4, '0'),
         fecha: document.getElementById('fecha').value,
@@ -598,6 +626,46 @@
         fotoGabinete: gabData,
         fotoPanoramica: panData,
       });
+      await supabaseClient
+      .from('registros_clandestinos')
+      .insert([{
+
+        codigo:
+          'ID-' + String(currentId).padStart(4, '0'),
+
+        fecha:
+          document.getElementById('fecha').value,
+
+        dni:
+          document.getElementById('dni').value.trim(),
+
+        distrito:
+          document.getElementById('distrito').value,
+
+        direccion:
+          document.getElementById('direccion').value.trim(),
+
+        sector:
+          document.getElementById('sector').value.trim(),
+
+        malla:
+          document.getElementById('malla').value.trim(),
+
+        coordenadas:
+          (lat && lng)
+            ? `${lat}, ${lng}`
+            : null,
+
+        carpeta:
+          carpeta,
+
+        foto_gabinete:
+          gabData,
+
+        foto_panoramica:
+          panData
+
+      }]);
       try { localStorage.setItem('campoRecords', JSON.stringify(records)); } catch(e) {}
       renderTable(); showToast(); generateNextId(); resetForm();
     });
@@ -735,6 +803,7 @@
   }
 </script>
 <script src="https://cdn.jsdelivr.net/npm/xlsx/dist/xlsx.full.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 </div>
 
 <script>
