@@ -479,23 +479,52 @@
       supabaseKey
     );
   
-  let records = JSON.parse(localStorage.getItem('campoRecords') || '[]');
-  let currentId = parseInt(localStorage.getItem('campoLastId') || '0');
-  async function probarSupabase() {
+  let records = [];
+  let currentId = 0;
 
-    const { data, error } =
-      await supabaseClient
-        .from('registros_clandestinos')
-        .select('*')
-        .limit(1);
+  // Limpiar localStorage legacy
+  localStorage.removeItem('campoRecords');
+  localStorage.removeItem('campoLastId');
 
-    console.log('DATA:', data);
-    console.log('ERROR:', error);
-
+  async function inicializar() {
+    await cargarDesdeSupabase();
+    generateNextId();
   }
-  generateNextId();
-  renderTable();
-  probarSupabase();
+
+  async function cargarDesdeSupabase() {
+    const { data, error } = await supabaseClient
+      .from('registros_clandestinos')
+      .select('*')
+      .order('id', { ascending: false });
+
+    if (error) { console.error('Error cargando datos:', error); return; }
+
+    records = (data || []).map(r => ({
+      id: r.codigo,
+      fecha: r.fecha,
+      dni: r.dni,
+      distrito: r.distrito,
+      direccion: r.direccion,
+      sector: r.sector || '—',
+      malla: r.malla || '—',
+      coordenadas: r.coordenadas || '—',
+      fotoGabinete: r.foto_gabinete,
+      fotoPanoramica: r.foto_panoramica,
+      _supabaseId: r.id
+    }));
+
+    // Calcular el mayor ID numérico para el autoincremento
+    if (records.length > 0) {
+      const nums = records
+        .map(r => parseInt((r.id || '').replace('ID-', '')))
+        .filter(n => !isNaN(n));
+      currentId = nums.length ? Math.max(...nums) : 0;
+    }
+
+    renderTable();
+  }
+
+  inicializar();
 
   function generateNextId() {
     document.getElementById('autoId').textContent = 'ID-' + String(currentId + 1).padStart(4, '0');
@@ -676,24 +705,12 @@
       )
     ])
     .then(async ([gabData, panData]) => {
-      records.push({
-        id: 'ID-' + String(currentId).padStart(4, '0'),
-        fecha: document.getElementById('fecha').value,
-        dni: document.getElementById('dni').value.trim(),
-        distrito: document.getElementById('distrito').value,
-        direccion: document.getElementById('direccion').value.trim(),
-        sector: document.getElementById('sector').value.trim() || '—',
-        malla: document.getElementById('malla').value.trim() || '—',
-        coordenadas: (lat && lng) ? `${lat}, ${lng}` : '—',
-        fotoGabinete: gabData,
-        fotoPanoramica: panData,
-      });
       await supabaseClient
       .from('registros_clandestinos')
       .insert([{
 
         codigo:
-          'ID-' + String(currentId).padStart(4, '0'),
+          'ID-' + String(currentId + 1).padStart(4, '0'),
 
         fecha:
           document.getElementById('fecha').value,
@@ -733,8 +750,10 @@
         }).replace(' ', 'T') + '-05:00'
 
       }]);
-      try { localStorage.setItem('campoRecords', JSON.stringify(records)); } catch(e) {}
-      renderTable(); showToast(); generateNextId(); resetForm();
+      await cargarDesdeSupabase();
+      showToast();
+      generateNextId();
+      resetForm();
     });
   });
 
@@ -817,25 +836,20 @@
   }
   });
 
-  function deleteRecord(id) {
-
+  async function deleteRecord(id) {
     const clave = prompt("Ingrese contraseña de administrador");
+    if (clave !== "Planner26") { alert("Contraseña incorrecta"); return; }
+    if (!confirm("¿Desea eliminar este registro?")) return;
 
-    if (clave !== "Planner26") {
-      alert("Contraseña incorrecta");
-      return;
-    }
+    const { error } = await supabaseClient
+      .from('registros_clandestinos')
+      .delete()
+      .eq('codigo', id);
 
-    if (!confirm("¿Desea eliminar este registro?")) {
-      return;
-    }
+    if (error) { alert("Error al eliminar: " + error.message); return; }
 
-    records = records.filter(r => r.id !== id);
-
-    localStorage.setItem('campoRecords', JSON.stringify(records));
-
-    renderTable();
-
+    await cargarDesdeSupabase();
+    generateNextId();
     alert("Registro eliminado correctamente");
   }
   function exportExcel() {
