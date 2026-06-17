@@ -4,6 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Formulario de Conexiones Clandestinas</title>
+<link rel="icon" href="data:,">
 <link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
 <style>
   :root {
@@ -409,14 +410,7 @@
       supabaseUrl,
       supabaseKey
     );
-  const supabaseUrl = 'https://jonlxurpxmjcxfgqxlli.supabase.co/rest/v1/';
-  const supabaseKey = 'sb_publishable_OoYnTUMdmJ_iSOdL_nr2IQ_zhwZFrYA';
-
-  const supabaseClient =
-    window.supabase.createClient(
-      supabaseUrl,
-      supabaseKey
-    );
+  
   let records = JSON.parse(localStorage.getItem('campoRecords') || '[]');
   let currentId = parseInt(localStorage.getItem('campoLastId') || '0');
   async function probarSupabase() {
@@ -801,44 +795,26 @@
       `Registro_Conexiones_${new Date().toISOString().slice(0,10)}.xlsx`
     );
   }
+
+  function login() {
+    const password = document.getElementById('loginPassword').value;
+    if (password === 'GABINETE') {
+      document.getElementById('loginScreen').style.display = 'none';
+      document.getElementById('appContent').style.display = 'block';
+    } else {
+      document.getElementById('loginError').style.display = 'block';
+      document.getElementById('loginPassword').value = '';
+    }
+  }
+
+  function togglePassword() {
+    const input = document.getElementById('loginPassword');
+    input.type = input.type === 'password' ? 'text' : 'password';
+  }
 </script>
 <script src="https://cdn.jsdelivr.net/npm/xlsx/dist/xlsx.full.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 </div>
-
-<script>
-
-function login() {
-
-  const password =
-    document.getElementById('loginPassword').value;
-
-  if (password === 'GABINETE') {
-
-    document.getElementById('loginScreen').style.display = 'none';
-    document.getElementById('appContent').style.display = 'block';
-
-  } else {
-
-    document.getElementById('loginError').style.display = 'block';
-    document.getElementById('loginPassword').value = '';
-
-  }
-}
-function togglePassword() {
-
-  const input = document.getElementById('loginPassword');
-
-  if (input.type === 'password') {
-    input.type = 'text';
-  } else {
-    input.type = 'password';
-  }
-
-}
-
-
-</script>
 
 </body>
 </html>
