@@ -971,9 +971,11 @@
         const resp = await fetch(urlCors);
         if (!resp.ok) throw new Error('No se pudo descargar');
         const blob = await resp.blob();
-        const ext = archivo.url.split('.').pop().split('?')[0] || 'jpg';
-        const nombreArchivo = `${archivo.codigo}_${archivo.tipo}.${ext}`;
-        const rutaEnZip = `${archivo.carpeta}/${nombreArchivo}`;
+        // Extraer nombre original tal como está en Cloudinary (sin extensión en la URL a veces)
+        const urlPath = archivo.url.split('?')[0];
+        const segmentos = urlPath.split('/');
+        const nombreConExt = segmentos[segmentos.length - 1]; // ej: ATE_S004444_MA0444_GAB.jpg
+        const rutaEnZip = `${archivo.carpeta}/${nombreConExt}`;
         zip.file(rutaEnZip, blob);
       } catch (e) {
         console.warn('Error descargando:', archivo.url, e);
