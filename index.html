@@ -725,7 +725,12 @@
           gabData,
 
         foto_panoramica:
-          panData
+          panData,
+
+        fecha_registro: new Date().toLocaleString('sv-SE', {
+          timeZone: 'America/Lima',
+          hour12: false
+        }).replace(' ', 'T') + '-05:00'
 
       }]);
       try { localStorage.setItem('campoRecords', JSON.stringify(records)); } catch(e) {}
