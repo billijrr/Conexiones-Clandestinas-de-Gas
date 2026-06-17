@@ -8,6 +8,7 @@
 <link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
 <script src="https://cdn.jsdelivr.net/npm/xlsx/dist/xlsx.full.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="https://cdn.jsdelivr.net/npm/jszip@3.10.1/dist/jszip.min.js"></script>
 <style>
   :root {
     --bg: #0d1117;
@@ -99,6 +100,23 @@
 
   .toast { position: fixed; bottom: 32px; right: 32px; background: var(--surface2); border: 1px solid var(--success); color: var(--success); padding: 14px 20px; border-radius: var(--radius); font-size: 14px; font-weight: 500; box-shadow: 0 8px 32px rgba(0,0,0,0.4); transform: translateY(20px); opacity: 0; transition: all 0.3s; z-index: 100; }
   .toast.show { transform: translateY(0); opacity: 1; }
+
+  /* === MODAL DESCARGA === */
+  .modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.7); display: none; align-items: center; justify-content: center; z-index: 500; backdrop-filter: blur(4px); }
+  .modal-overlay.open { display: flex; }
+  .modal-box { background: var(--surface); border: 1px solid var(--border); border-radius: 14px; padding: 32px; width: 100%; max-width: 480px; box-shadow: 0 24px 64px rgba(0,0,0,0.5); }
+  .modal-title { font-family: 'Space Mono', monospace; font-size: 11px; color: var(--accent); letter-spacing: 3px; text-transform: uppercase; margin-bottom: 6px; }
+  .modal-box h3 { font-size: 18px; font-weight: 600; margin-bottom: 24px; }
+  .modal-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin-bottom: 14px; }
+  .modal-field { display: flex; flex-direction: column; gap: 6px; }
+  .modal-field.full { grid-column: 1 / -1; }
+  .modal-field label { font-size: 11px; font-weight: 600; color: var(--text-muted); text-transform: uppercase; letter-spacing: 1.5px; }
+  .modal-actions { display: flex; gap: 10px; justify-content: flex-end; margin-top: 24px; padding-top: 20px; border-top: 1px solid var(--border); }
+  .progress-bar-wrap { display: none; margin-top: 16px; background: var(--bg); border-radius: 6px; overflow: hidden; height: 8px; }
+  .progress-bar-wrap.show { display: block; }
+  .progress-bar-inner { height: 100%; background: var(--accent); width: 0%; transition: width 0.3s; border-radius: 6px; }
+  .progress-label { font-size: 12px; color: var(--text-muted); margin-top: 8px; text-align: center; display: none; }
+  .progress-label.show { display: block; }
 
   input.invalid, select.invalid { border-color: var(--error) !important; }
   .err-msg { font-size: 11px; color: var(--error); display: none; }
@@ -370,6 +388,7 @@
     </div>
 
     <div class="actions">
+      <button type="button" class="btn btn-ghost" onclick="abrirModalDescarga()">📥 Descargar fotos</button>
       <button type="button" class="btn btn-ghost" onclick="resetForm()">Limpiar formulario</button>
       <button type="submit" class="btn btn-primary">Guardar registro →</button>
     </div>
@@ -402,6 +421,53 @@
 </div>
 
 <div class="toast" id="toast">✅ Registro guardado correctamente</div>
+
+<!-- MODAL DESCARGA DE FOTOS -->
+<div class="modal-overlay" id="modalDescarga">
+  <div class="modal-box">
+    <div class="modal-title">📥 Exportar imágenes</div>
+    <h3>Descargar fotos</h3>
+    <div class="modal-grid">
+      <div class="modal-field">
+        <label>Fecha inicio</label>
+        <input type="date" id="filtroFechaInicio">
+      </div>
+      <div class="modal-field">
+        <label>Fecha fin</label>
+        <input type="date" id="filtroFechaFin">
+      </div>
+      <div class="modal-field full">
+        <label>Distrito <span style="color:var(--text-muted);font-size:10px;">(dejar vacío = todos)</span></label>
+        <select id="filtroDistrito">
+          <option value="">— Todos los distritos —</option>
+          <option>ANCÓN</option><option>ATE</option><option>BARRANCO</option>
+          <option>BREÑA</option><option>CARABAYLLO</option><option>CHACLACAYO</option>
+          <option>CHORRILLOS</option><option>CIENEGUILLA</option><option>COMAS</option>
+          <option>EL AGUSTINO</option><option>INDEPENDENCIA</option><option>JESÚS MARÍA</option>
+          <option>LA MOLINA</option><option>LA VICTORIA</option><option>LINCE</option>
+          <option>LOS OLIVOS</option><option>LURIGANCHO</option><option>LURÍN</option>
+          <option>MAGDALENA DEL MAR</option><option>MIRAFLORES</option><option>PACHACÁMAC</option>
+          <option>PUCUSANA</option><option>PUEBLO LIBRE</option><option>PUENTE PIEDRA</option>
+          <option>PUNTA HERMOSA</option><option>PUNTA NEGRA</option><option>RÍMAC</option>
+          <option>SAN BARTOLO</option><option>SAN BORJA</option><option>SAN ISIDRO</option>
+          <option>SAN JUAN DE LURIGANCHO</option><option>SAN JUAN DE MIRAFLORES</option>
+          <option>SAN LUIS</option><option>SAN MARTÍN DE PORRES</option><option>SAN MIGUEL</option>
+          <option>SANTA ANITA</option><option>SANTA MARÍA DEL MAR</option><option>SANTA ROSA</option>
+          <option>SANTIAGO DE SURCO</option><option>SURQUILLO</option><option>VILLA EL SALVADOR</option>
+          <option>VILLA MARÍA DEL TRIUNFO</option>
+        </select>
+      </div>
+    </div>
+    <div class="progress-bar-wrap" id="progressWrap">
+      <div class="progress-bar-inner" id="progressBar"></div>
+    </div>
+    <div class="progress-label" id="progressLabel"></div>
+    <div class="modal-actions">
+      <button class="btn btn-ghost" onclick="cerrarModalDescarga()">Cancelar</button>
+      <button class="btn btn-primary" id="btnDescargar" onclick="descargarFotos()">⬇ Descargar ZIP</button>
+    </div>
+  </div>
+</div>
 
 <script>
   const supabaseUrl = 'https://jonlxurpxmjcxfgqxlli.supabase.co';
@@ -812,6 +878,119 @@
   function togglePassword() {
     const input = document.getElementById('loginPassword');
     input.type = input.type === 'password' ? 'text' : 'password';
+  }
+
+  function abrirModalDescarga() {
+    document.getElementById('modalDescarga').classList.add('open');
+  }
+
+  function cerrarModalDescarga() {
+    document.getElementById('modalDescarga').classList.remove('open');
+    document.getElementById('progressWrap').classList.remove('show');
+    document.getElementById('progressLabel').classList.remove('show');
+    document.getElementById('progressBar').style.width = '0%';
+    document.getElementById('btnDescargar').disabled = false;
+    document.getElementById('btnDescargar').textContent = '⬇ Descargar ZIP';
+  }
+
+  async function descargarFotos() {
+    const fechaInicio = document.getElementById('filtroFechaInicio').value;
+    const fechaFin = document.getElementById('filtroFechaFin').value;
+    const distrito = document.getElementById('filtroDistrito').value;
+
+    if (!fechaInicio || !fechaFin) {
+      alert('Por favor ingresa el rango de fechas.');
+      return;
+    }
+    if (fechaInicio > fechaFin) {
+      alert('La fecha de inicio no puede ser mayor a la fecha fin.');
+      return;
+    }
+
+    const btn = document.getElementById('btnDescargar');
+    btn.disabled = true;
+    btn.textContent = 'Consultando...';
+
+    // Consultar Supabase con filtros
+    let query = supabaseClient
+      .from('registros_clandestinos')
+      .select('foto_gabinete, foto_panoramica, carpeta, codigo')
+      .gte('fecha', fechaInicio)
+      .lte('fecha', fechaFin);
+
+    if (distrito) {
+      query = query.eq('distrito', distrito);
+    }
+
+    const { data, error } = await query;
+
+    if (error || !data || data.length === 0) {
+      alert('No se encontraron registros con esos filtros.');
+      btn.disabled = false;
+      btn.textContent = '⬇ Descargar ZIP';
+      return;
+    }
+
+    // Recopilar todas las URLs
+    const archivos = [];
+    data.forEach(r => {
+      if (r.foto_gabinete) archivos.push({ url: r.foto_gabinete, carpeta: r.carpeta, codigo: r.codigo, tipo: 'GAB' });
+      if (r.foto_panoramica) archivos.push({ url: r.foto_panoramica, carpeta: r.carpeta, codigo: r.codigo, tipo: 'PAN' });
+    });
+
+    if (archivos.length === 0) {
+      alert('Los registros encontrados no tienen fotos.');
+      btn.disabled = false;
+      btn.textContent = '⬇ Descargar ZIP';
+      return;
+    }
+
+    // Mostrar barra de progreso
+    const progressWrap = document.getElementById('progressWrap');
+    const progressBar = document.getElementById('progressBar');
+    const progressLabel = document.getElementById('progressLabel');
+    progressWrap.classList.add('show');
+    progressLabel.classList.add('show');
+    btn.textContent = 'Descargando...';
+
+    const zip = new JSZip();
+    let completados = 0;
+
+    for (const archivo of archivos) {
+      try {
+        // Usar proxy de Cloudinary para evitar CORS
+        const urlCors = archivo.url.replace(
+          'https://res.cloudinary.com',
+          'https://res.cloudinary.com'
+        );
+        const resp = await fetch(urlCors);
+        if (!resp.ok) throw new Error('No se pudo descargar');
+        const blob = await resp.blob();
+        const ext = archivo.url.split('.').pop().split('?')[0] || 'jpg';
+        const nombreArchivo = `${archivo.codigo}_${archivo.tipo}.${ext}`;
+        const rutaEnZip = `${archivo.carpeta}/${nombreArchivo}`;
+        zip.file(rutaEnZip, blob);
+      } catch (e) {
+        console.warn('Error descargando:', archivo.url, e);
+      }
+      completados++;
+      const pct = Math.round((completados / archivos.length) * 100);
+      progressBar.style.width = pct + '%';
+      progressLabel.textContent = `Descargando foto ${completados} de ${archivos.length}...`;
+    }
+
+    progressLabel.textContent = 'Generando ZIP...';
+    const zipBlob = await zip.generateAsync({ type: 'blob' });
+    const link = document.createElement('a');
+    link.href = URL.createObjectURL(zipBlob);
+    const nombreZip = `fotos_${fechaInicio}_${fechaFin}${distrito ? '_' + distrito.replace(/\s+/g,'_') : ''}.zip`;
+    link.download = nombreZip;
+    link.click();
+    URL.revokeObjectURL(link.href);
+
+    progressLabel.textContent = `✅ ${archivos.length} fotos descargadas correctamente.`;
+    btn.textContent = '✅ Listo';
+    setTimeout(() => cerrarModalDescarga(), 2000);
   }
 </script>
 </div>
